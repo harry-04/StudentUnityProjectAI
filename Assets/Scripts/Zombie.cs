@@ -15,9 +15,7 @@ public class Zombie : MonoBehaviour
     private bool withinAttackRange;
     private float changeMind;
     private float attackTimer;
-
-
-   
+    // Use this for initialization
     void Start()
     {
         player = FindObjectOfType<PlayerMove>();
@@ -26,7 +24,6 @@ public class Zombie : MonoBehaviour
         brain = GetComponent<StateMachine>();
         playerIsNear = false;
         withinAttackRange = false;
-
         brain.PushState(Idle, OnIdleEnter, OnIdleExit);
     }
 
@@ -42,10 +39,9 @@ public class Zombie : MonoBehaviour
         stateNote.text = "Idle";
         agent.ResetPath();
     }
-
     void Idle()
     {
-        stateNote.text = "Idle";
+
         changeMind -= Time.deltaTime;
         if (playerIsNear)
         {
@@ -57,40 +53,9 @@ public class Zombie : MonoBehaviour
             changeMind = Random.Range(4, 10);
         }
     }
-
     void OnIdleExit()
     {
 
-    }
-
-    void OnWanderEnter()
-    {
-        stateNote.text = "Wander";
-        animator.SetBool("Chase", true);
-        Vector3 wanderDirection = (Random.insideUnitSphere * 4f) + transform.position;
-        NavMeshHit navMeshHit;
-        NavMesh.SamplePosition(wanderDirection, out navMeshHit, 3f, NavMesh.AllAreas);
-        Vector3 destination = navMeshHit.position;
-        agent.SetDestination(destination);
-    }
-
-    void Wander()
-    {
-        stateNote.text = "Wander";
-        if (agent.remainingDistance <= .25f)
-        {
-            agent.ResetPath();
-            brain.PushState(Idle, OnIdleEnter, OnIdleExit);
-        }
-        if (playerIsNear)
-        {
-            brain.PushState(Chase, OnChaseEnter, OnChaseExit);
-        }
-    }
-
-    void OnWanderExit()
-    {
-        animator.SetBool("Chase", false);
     }
 
     void OnChaseEnter()
@@ -98,7 +63,6 @@ public class Zombie : MonoBehaviour
         animator.SetBool("Chase", true);
         stateNote.text = "Chase";
     }
-
     void Chase()
     {
         agent.SetDestination(player.transform.position);
@@ -112,8 +76,35 @@ public class Zombie : MonoBehaviour
             brain.PushState(Attack, OnEnterAttack, null);
         }
     }
-
     void OnChaseExit()
+    {
+        animator.SetBool("Chase", false);
+    }
+
+    void OnWanderEnter()
+    {
+        stateNote.text = "Wander";
+        animator.SetBool("Chase", true);
+        Vector3 wanderDirection = (Random.insideUnitSphere * 4f) + transform.position;
+        NavMeshHit navMeshHit;
+        NavMesh.SamplePosition(wanderDirection, out navMeshHit, 3f, NavMesh.AllAreas);
+        Vector3 destination = navMeshHit.position;
+        agent.SetDestination(destination);
+    }
+    void Wander()
+    {
+
+        if (agent.remainingDistance <= .25f)
+        {
+            agent.ResetPath();
+            brain.PushState(Idle, OnIdleEnter, OnIdleExit);
+        }
+        if (playerIsNear)
+        {
+            brain.PushState(Chase, OnChaseEnter, OnChaseExit);
+        }
+    }
+    void OnWanderExit()
     {
         animator.SetBool("Chase", false);
     }
@@ -123,7 +114,6 @@ public class Zombie : MonoBehaviour
         agent.ResetPath();
         stateNote.text = "Attack";
     }
-
     void Attack()
     {
         attackTimer -= Time.deltaTime;

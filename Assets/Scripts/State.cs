@@ -3,12 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-
-
-
-
 public class State
 {
+
     public Action ActiveAction, OnEnterAction, OnExitAction;
 
     public State(Action active, Action onEnter, Action onExit)
@@ -17,10 +14,6 @@ public class State
         OnEnterAction = onEnter;
         OnExitAction = onExit;
     }
-
-
-
-
 
     public void Execute()
     {
@@ -39,8 +32,4 @@ public class State
         if (OnExitAction != null)
             OnExitAction.Invoke();
     }
-
-
-
-
 }
